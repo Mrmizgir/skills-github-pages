@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Конвертер единиц</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    padding: 15px;
+    background: #f0f4f8;
+    color: #333;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .converter {
+    max-width: 400px;
+    margin: 0 auto 30px;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  .converter h2 {
+    margin-bottom: 12px;
+    font-size: 1.2rem;
+    text-align: center;
+  }
+  .btn-group {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+  button {
+    flex: 1;
+    padding: 10px 0;
+    font-size: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    color: #333;
+    transition: all 0.3s ease;
+    user-select: none;
+  }
+  button.active {
+    background: #007BFF;
+    border-color: #007BFF;
+    color: white;
+  }
+  button:focus {
+    outline: none;
+    box-shadow: 0 0 3px 2px #007BFFAA;
+  }
+  input[type="number"] {
+    width: 100%;
+    padding: 12px 10px;
+    border-radius: 8px;
+    border: 2px solid #ddd;
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+  }
+  input[type="number"]:focus {
+    border-color: #007BFF;
+    outline: none;
+  }
+  .result {
+    font-size: 1.1rem;
+    text-align: center;
+    margin-top: 5px;
+    font-weight: 600;
+  }
+  @media (max-width: 400px) {
+    body {
+      padding: 10px;
+    }
+    .converter {
+      padding: 15px 12px;
+    }
+    button {
+      font-size: 0.9rem;
+      padding: 8px 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h1>Конвертер единиц</h1>
+
+<div class="converter" id="weightConverter">
+  <h2>Килограммы - Фунты</h2>
+  <div class="btn-group" id="weightModeButtons">
+    <button data-mode="kgToLb" class="active">Кг → Фунт</button>
+    <button data-mode="lbToKg">Фунт → Кг</button>
+  </div>
+  <input type="number" id="weightInput" placeholder="Введите значение" min="0" step="any" />
+  <div class="result" id="weightResult">Результат:</div>
+</div>
+
+<div class="converter" id="lengthConverter">
+  <h2>Футы - Метры</h2>
+  <div class="btn-group" id="lengthModeButtons">
+    <button data-mode="ftToM" class="active">Футы → Метры</button>
+    <button data-mode="mToFt">Метры → Футы</button>
+  </div>
+  <input type="number" id="lengthInput" placeholder="Введите значение" min="0" step="any" />
+  <div class="result" id="lengthResult">Результат:</div>
+</div>
+
+<div class="converter" id="distanceConverter">
+  <h2>Мили - Километры</h2>
+  <div class="btn-group" id="distanceModeButtons">
+    <button data-mode="miToKm" class="active">Мили → Км</button>
+    <button data-mode="kmToMi">Км → Мили</button>
+  </div>
+  <input type="number" id="distanceInput" placeholder="Введите значение" min="0" step="any" />
+  <div class="result" id="distanceResult">Результат:</div>
+</div>
+
+<script>
+  // Все конвертации
+  const conversions = {
+    weight: {
+      kgToLb: val => val * 2.20462,
+      lbToKg: val => val / 2.20462
+    },
+    length: {
+      ftToM: val => val * 0.3048,
+      mToFt: val => val / 0.3048
+    },
+    distance: {
+      miToKm: val => val * 1.60934,
+      kmToMi: val => val / 1.60934
+    }
+  };
+
+  function setupConverter(converterId, buttonsId, inputId, resultId, type) {
+    const buttons = document.querySelectorAll(`#${buttonsId} button`);
+    const input = document.getElementById(inputId);
+    const resultDiv = document.getElementById(resultId);
+    let currentMode = buttons[0].dataset.mode;
+
+    function convertAndDisplay() {
+      const val = parseFloat(input.value);
+      if (isNaN(val)) {
+        resultDiv.textContent = 'Результат:';
+        return;
+      }
+      const converted = conversions[type][currentMode](val);
+      // Округляем до 4 знаков после запятой
+      resultDiv.textContent = `Результат: ${converted.toFixed(4)}`;
+    }
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.dataset.mode === currentMode) return;
+        currentMode = btn.dataset.mode;
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        input.value = '';
+        resultDiv.textContent = 'Результат:';
+      });
+    });
+
+    input.addEventListener('input', convertAndDisplay);
+  }
+
+  setupConverter('weightConverter', 'weightModeButtons', 'weightInput', 'weightResult', 'weight');
+  setupConverter('lengthConverter', 'lengthModeButtons', 'lengthInput', 'lengthResult', 'length');
+  setupConverter('distanceConverter', 'distanceModeButtons', 'distanceInput', 'distanceResult', 'distance');
+</script>
+
+</body>
+</html>
